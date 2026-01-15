@@ -1,0 +1,257 @@
+{% extends "index.html" %}
+{% load static %}
+{% load templatetags %}
+{% block content %}
+
+<!--mathjax-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <style>
+        a.nav-a-literature{
+            background: #62bcea;
+            color: white;
+        }
+        a.nav-a-literature:hover{
+            background: white;
+        }
+    </style>
+{% load templatetags %}
+<div class="carousel-background-literature">
+    <div class="carousel">
+        <ul>
+    <div class="owl-carousel">
+    <!-- Iterate over seat_list -->
+    {% for seat in combined.roundabout %}
+        <a class="detail-carousel" href="{%url 'details' class_name=seat.class_name id=seat.id%}">
+        <div class="wrapper">
+            {% if seat.image.url != null %}
+            <img class="image" src="{{seat.image.url}}" alt="{{seat.image.name}}" class="title_image">
+            {% else %}
+                {% if seat.expertise.expertise_en == 'literature' %}
+                <img class="image" src="{% static 'literature_img.png' %}" alt="literature" class="title_image">
+                {% elif seat.expertise.expertise_en == 'art' %}
+                <img class="image" src="{% static 'art_img.png' %}" alt="art" class="title_image">
+                {% elif seat.expertise.expertise_en == 'science' %}
+                {% elif seat.expertise.expertise_en == 'entertainment' %}
+                {% endif %}
+            {% endif %}
+            <div class="post_info">
+                {% if  seat.expertise.expertise_en == 'literature' %}
+                    {%  if seat.class_name == "Chapter"%}
+                        <p class="latest-category-blue">chapter</p>
+                    {%  elif seat.class_name == "Poem"%}
+                        <p class="latest-category-blue">poem</p>
+                    {% endif %}
+                {% elif seat.expertise.expertise_en == 'art' %}
+                    <p class="latest-category-pink">{{seat.expertise.expertise_en}}</p>
+                {% elif seat.expertise.expertise_en == 'entertainment'%}
+                    <p class="latest-category-purple">{{seat.expertise.expertise_en}}</p>
+                {% elif seat.expertise.expertise_en == 'science' %}
+                    <p class="latest-category-yellow">{{seat.expertise.expertise_en}}</p>
+                {% endif %}
+                <div class="title">
+                    <p>{{seat.title|truncatechars:35}}</p>
+                </div>
+                <div class="author_date">
+                    {% if seat.author.middleName != null %}
+                    <p class="author">{{seat.author.firstName.0}}. {{seat.author.middleName.0}}. {{seat.author.lastName}}</p>
+                    {% else %}
+                    <p class="author">{{seat.author.firstName.0}}. {{seat.author.lastName}}</p>
+                    {% endif %}
+                    <p class="date">{{seat.date|date:"d.m.Y"}}</p>
+                </div>
+            </div>
+        </div>
+        </a>
+    <!-- If seat_list is empty  -->
+    {% empty %}
+    <li>No seats yet.</li>
+    {% endfor %}
+    </div>
+</ul>
+    </div>
+</div>
+<!--scripts-->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+<script src="{% static 'roundabout.js' %}"></script>
+
+<ul>
+    <div class="latest">
+    <!-- Iterate over post_list -->
+    {% for post in combined.latest  %}
+        <div class="one-post">
+            <div class="latest-image-div">
+                <a href="{%url 'details' post.class_name post.id%}">
+                {% if post.image.url != null %}
+                    <img class="latest-image" src="{{post.image.url}}" alt="{{post.image.name}}" class="title_image">
+                {% else %}
+                    <img class="latest-image" src="{% static 'literature_img.png' %}" alt="literature" class="title_image">
+                {% endif %}
+                </a>
+            </div>
+<!--            <a style=" text-decoration: none; float: left"  href="{%url 'details' post.class_name post.id%}">Read on...</a>-->
+            <div class="latest-post-info">
+                <div class="latest-category-author-date">
+                    <div class="latest-genre">
+                        {% if post.class_name == "Chapter"%}
+                            <p class="thumbnail-book-genre">{{post.genre.category_en}}</p>
+                        {% elif post.class_name == "Poem"%}
+                            <p class="thumbnail-book-genre">poem</p>
+                        {% endif %}
+                    </div>
+                    <br>
+                    <br>
+                    <div class="latest-date-author">
+                        <p class="latest-date">{{post.date|date:"d.m.Y"}}</p>
+                        {% if post.author.middleName != null %}
+                            <p class="latest-author">{{post.author.firstName.0}}. {{post.author.middleName.0}}. {{post.author.lastName}}</p>
+                        {% else %}
+                            <p class="latest-author">{{post.author.firstName.0}}. {{post.author.lastName}}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <br>
+                <h3 class="latest-title">{{post.title}}</h3>
+                {% if post.volume.title != null %}
+                    <p class="latest-literature-title">{{post.volume.title}}</p>
+                {% endif %}
+                {% if post.book.title != null %}
+                    <p class="latest-literature-title">{{post.book.title}}</p>
+                {% endif %}
+                    <div id="latest-content" class="latest-content">
+                            <p class="latest-literature-content">{{post.content|safe|truncatewords:45}}</p>
+                    </div>
+                <a class="detail-latest" href="{%url 'details' class_name=post.class_name id=post.id%}">
+                <div class="detail-latest-div">
+                    <p class="latest-detail-link">Read the piece here</p>
+                    <img class="latest-right-arrow" src="{% static 'arrow_right.png' %}" alt="arrow">
+                </div>
+                </a>
+            </div>
+        </div>
+    <!-- If post_list is empty  -->
+    {% empty %}
+    <li>No posts yet.</li>
+    {% endfor %}
+    </div>
+</ul>
+
+<div class="thumbnail-book-volume">
+    <!-- Iterate over thumb_list -->
+    {% for book_volume in combined.books_volumes %}
+    <a class="thumbnail-detail-book-volume" href="{%url 'details' class_name=book_volume.class_name id=book_volume.id%}">
+        <div class="one-thumbnail-book-volume">
+            <div class="thumbnail-book-volume-image-div">
+                {% if book_volume.cover.url != null %}
+                    <img class="thumbnail-book-volume-image" src="{{book_volume.cover.url}}" alt="{{book_volume.cover.name}}">
+                {% else %}
+                    <img class="thumbnail-image" src="{% static 'literature_img.png' %}" alt="literature">
+                {% endif %}
+            </div>
+            <div class="thumbnail-info-book">
+                <div class="thumbnail-book-volume-genre">
+                    {% if book_volume.class_name == "Book"%}
+                        <p class="thumbnail-book-genre">{{book_volume.class_name}}</p>
+                        <p class="thumbnail-book-genre">{{book_volume.genre.category_en}}</p>
+                    {% elif book_volume.class_name == "Volume"%}
+                        <p class="thumbnail-book-genre">Poems</p>
+                    {% endif %}
+                </div>
+                <div style="height: 3px; width: 100%; display: inline-block"></div>
+                <h3 class="thumbnail-book-volume-title">{{book_volume.title}}</h3>
+                <div class="thumbnail-book-volume-author-div">
+                        {% if thumb.author.middleName != null %}
+                            <p class="thumbnail-book-volume-author">{{book_volume.author.firstName.0}}. {{book_volume.author.middleName.0}}. {{book_volume.author.lastName}}</p>
+                        {% else %}
+                            <p class="thumbnail-book-volume-author">{{book_volume.author.firstName.0}}. {{book_volume.author.lastName}}</p>
+                        {% endif %}
+                </div>
+                <div class="thumbnail-content">
+                    {% for chapter_poem in combined.thumbnail %}
+                    <a href="{%url 'details' class_name=chapter_poem.class_name id=chapter_poem.id%}">
+                        {% if chapter_poem.book == book_volume or chapter_poem.volume == book_volume %}
+                            <div class="thumbnail-one-chapter-poem">
+                                <p class="thumbnail-chapter-poem-title">{{chapter_poem.number}}. {{chapter_poem.title}}</p>
+                                {% if chapter_poem.date <= combined.current_date and chapter_poem.date >= combined.two_weeks_back %}
+                                <p class="thumbnail-chapter-poem-new">NEW</p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </a>
+
+    <div class="literature-thumbnail-gap"></div>
+    <!-- If thumb_list is empty  -->
+    {% empty %}
+        <p>No thumbnails</p>
+    {% endfor %}
+    </div>
+
+    <hr id="records-found-divider">
+    <div class="pagination-nav">
+        {% if combined.books_volumes.has_previous %}
+    <a href="?page={{ combined.books_volumes.previous_page_number }}">« Previous page</a>
+
+    {% if combined.books_volumes.number > 3 %}
+    <a href="?page=1">1</a>
+    {% if combined.books_volumes.number > 4 %}
+    <span>...</span>
+    {% endif %}
+    {% endif %}
+    {% endif %}
+
+    {% for num in combined.books_volumes.paginator.page_range %}
+    {% if combined.books_volumes.number == num %}
+    <a href="?page={{ num }}">{{ num }}</a>
+    {% elif num > combined.books_volumes.number|add:'-3' and num < combined.books_volumes.number|add:'3' %}
+    <a href="?page={{ num }}">{{ num }}</a>
+    {% endif %}
+    {% endfor %}
+
+    {% if combined.books_volumes.has_next %}
+    {% if combined.books_volumes.number < combined.books_volumes.paginator.num_pages|add:'-3' %}
+    <span>...</span>
+    <a href="?page={{ combined.books_volumes.paginator.num_pages }}">{{ combined.books_volumes.paginator.num_pages }}</a>
+    {% elif combined.books_volumes.number < combined.books_volumes.paginator.num_pages|add:'-2' %}
+    <a href="?page={{ combined.books_volumes.paginator.num_pages }}">{{ combined.books_volumes.paginator.num_pages }}</a>
+    {% endif %}
+
+    <a href="?page={{ combined.books_volumes.next_page_number }}">Next Page »</a>
+    {% endif %}
+    </div>
+    <hr id="records-found-divider">
+
+
+<section id="contact-form">
+    <form class="d-flex" id="form-mail" method=POST action="{%url 'email_send'%}">
+        {% csrf_token %}
+        <div class="mail-form-title-div">
+            <p class="contact-form-title">Any questions, feedback, collaboration proposal or lets say...
+            commision?</p>
+            <p class="contact-form-title">Write to us :-)</p>
+        </div>
+        <div class="mail-address">
+            <p class="text-mail">Address: </p>
+            <input class="form-mail-address" name="email" type="text" placeholder="Your email">
+        </div>
+        <div class="mail-title">
+            <p class="text-mail">Title: </p>
+            <input class="form-mail-title" name="title" type="text" placeholder="Title">
+        </div>
+        <div class="mail-content">
+            <p class="text-mail"> Mail:</p>
+            <textarea class="form-mail-content" rows="1" name="content" oninput="auto_height(this)"
+                      placeholder="Write the mail here..."></textarea>
+        </div>
+        <div class="mail-address">
+        <button id="btn-send" class="btn-send" type="submit">Send</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends "index.html" %}
+{% block content %}
+{% load static %}
+{% load templatetags %}
+
+<style>
+    #section1 {
+        display: flex;
+        height: fit-content;
+    }
+</style>
+
+<div id="">
+    <div class="thumbnail">
+        {% if combined == 'empty' %}
+        <p id="search-form-empty">No records for sentence:</p>
+        <p id="search-form-empty">{{sentence}}</p>
+        <p id="search-form-empty">has been found :-(</p>
+        <p id="search-form-empty">Try another sentence.</p>
+        {% elif combined %}
+        <div id="records-found-text">
+            <p class="records-found-text">{{records}} records for sentence:</p>
+            <p class="records-found-text">{{sentence}}</p>
+            <p class="records-found-text">has been found :-)</p>
+        </div>
+        <hr id="records-found-divider">
+
+        {% for thumb in combined %}
+        <a class="detail-thumbnail" href="{%url 'details' thumb.class_name thumb.id%}">
+            <div class="one-thumbnail">
+                <div class="thumbnail-image-div">
+                    {% if thumb.image.url != null %}
+                    <img class="thumbnail-image" src="{{thumb.image.url}}" alt="{{thumb.image.name}}">
+                    {% elif thumb.cover.url != null %}
+                    <img class="thumbnail-image" src="{{thumb.cover.url}}" alt="{{thumb.cover.name}}">
+                    {% else %}
+                    {% if thumb.expertise.expertise == 'literature' %}
+                    <img class="thumbnail-image" src="{% static 'literature_img.png' %}" alt="literature">
+                    {% elif thumb.expertise.expertise == 'art' %}
+                    <img class="thumbnail-image" src="{% static 'art_img.png' %}" alt="art">
+                    {% elif thumb.expertise.expertise == 'science' %}
+                    <img class="thumbnail-image" src="{% static 'science_img.png' %}" alt="science">
+                    {% elif thumb.expertise.expertise == 'entertainment' %}
+                    <img class="thumbnail-image" src="{% static 'entertainment_img.png' %}" alt="entertainment">
+                    {% endif %}
+                    {% endif %}
+                </div>
+                <div class="thumbnail-info">
+                    <div class="thumbnail-category_author_date">
+                        <div class="thumbnail-expertise-date">
+                            {% if thumb.expertise.expertise == 'literature' %}
+                            <p class="thumbnail-category-blue">{{thumb.expertise.expertise}}</p>
+                            {% elif thumb.expertise.expertise == 'art' %}
+                            <p class="thumbnail-category-pink">{{thumb.expertise.expertise}}</p>
+                            {% elif thumb.expertise.expertise == 'entertainment'%}
+                            <p class="thumbnail-category-purple">{{thumb.expertise.expertise}}</p>
+                            {% elif thumb.expertise.expertise == 'science' %}
+                            <p class="thumbnail-category-yellow">{{thumb.expertise.expertise}}</p>
+                            {% endif %}
+                            {% if thumb.expertise.expertise == 'literature' %}
+                            {% if thumb.volume.title != null %}
+                            <p class="thumbnail-literature-title">{{thumb.volume.title}}</p>
+                            {% elif thumb.volume.book != null %}
+                            <p class="thumbnail-literature-title">{{thumb.book.title}}</p>
+                            {% endif %}
+                            {% elif thumb.expertise.expertise == 'art' %}
+                            <p class="thumbnail-art-category">{{thumb.category}}</p>
+                            {% endif %}
+                            <p class="thumbnail-date">{{thumb.date|date:"d.m.Y"}}</p>
+                        </div>
+                        <div class="thumbnail-author-div">
+                            {% if thumb.author.middleName != null %}
+                            <p class="thumbnail-author">{{thumb.author.firstName.0}}. {{thumb.author.middleName.0}}.
+                                {{thumb.author.lastName}}</p>
+                            {% else %}
+                            <p class="thumbnail-author">{{thumb.author.firstName.0}}. {{thumb.author.lastName}}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <h3 class="thumbnail-title">{{thumb.title}}</h3>
+                    <div class="thumbnail-content">
+                        {% if thumb.expertise.expertise == 'literature' %}
+                        <div id="thumbnail-literature-content" class="thumbnail-literature-content">
+                            <p class="thumbnail-literature-content">
+                                {{thumb.content|highlight_code|safe|truncatewords:25}}</p>
+                        </div>
+                        <div id="thumbnail-literature-content-small" class="thumbnail-literature-content-small">
+                            <p class="thumbnail-literature-content-small">
+                                {{thumb.content|highlight_code|safe|truncatewords:15}}</p>
+                        </div>
+                        {% elif thumb.expertise.expertise == 'art' and thumb.dimentionX != blank %}
+                        <table class="thumbnail-art-table">
+                            <tr>
+                                <td class="thumbnail-art-col1">Materials:</td>
+                                <td class="thumbnail-art-col2">{{thumb.materials}}</td>
+                            </tr>
+                            <tr>
+                                <td class="thumbnail-art-col1">Dimentions:</td>
+                                <td class="thumbnail-art-col2">{{thumb.dimentionX}}x{{thumb.dimentionY}} mm</td>
+                            </tr>
+                        </table>
+                        {% elif thumb.expertise.expertise == 'entertainment' or thumb.expertise.expertise == 'science'%}
+                        <div class="thumbnail-post-content">
+                            <p class="thumbnail-post-content">{{thumb.content|highlight_code|safe|truncatewords:25}}</p>
+                        </div>
+                        <div class="thumbnail-post-content-small">
+                            <p class="thumbnail-post-content-small">
+                                {{thumb.content|highlight_code|safe|truncatewords:15}}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </a>
+        <div class="ultimate-thumbnail-gap"></div>
+        <!-- If thumb_list is empty  -->
+        {% empty %}
+        <p>No thumbnails</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+
+<section id="contact-form">
+    <form class="d-flex" id="form-mail" method=POST action="{%url 'email_send'%}">
+        {% csrf_token %}
+        <div class="mail-form-title-div">
+            <p class="contact-form-title">Any questions, feedback, collaboration proposal or lets say...
+                commision?</p>
+            <p class="contact-form-title">Write to us :-)</p>
+        </div>
+        <div class="mail-address">
+            <p class="text-mail">Address: </p>
+            <input class="form-mail-address" name="email" type="text" placeholder="Your email">
+        </div>
+        <div class="mail-title">
+            <p class="text-mail">Title: </p>
+            <input class="form-mail-title" name="title" type="text" placeholder="Title">
+        </div>
+        <div class="mail-content">
+            <p class="text-mail"> Mail:</p>
+            <textarea class="form-mail-content" rows="1" name="content" oninput="auto_height(this)"
+                      placeholder="Write the mail here..."></textarea>
+        </div>
+        <div class="mail-address">
+            <button id="btn-send" class="btn-send" type="submit">Send</button>
+        </div>
+    </form>
+</section>
+{% endblock %}
+{% block extrascripts %}
+<script src="{% static 'navbar.js' %}"></script>
+<script src="{% static 'upButton.js' %}"></script>
+<script src="{% static 'checkbox_all.js' %}"></script>
+<script src="{% static 'scroll_indicator.js' %}"></script>
+<script src="{% static 'search_nav_button.js' %}"></script>
+{% endblock %}
